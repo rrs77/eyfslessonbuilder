@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Settings, Upload, Palette, School, RotateCcw, X, Check, Plus, Trash2, GripVertical, Edit3, Save, Users } from 'lucide-react';
 import { useSettings } from '../contexts/SettingsContext';
 import { DataSourceSettings } from './DataSourceSettings';
+import { ClassManagement } from './ClassManagement';
 import { useAuth } from '../hooks/useAuth';
-// import SubjectManagement from './SubjectManagement'; // Commented out for now
 
 interface UserSettingsProps {
   isOpen: boolean;
@@ -17,7 +17,7 @@ export function UserSettings({ isOpen, onClose }: UserSettingsProps) {
   const [tempCategories, setTempCategories] = useState(categories);
   const [tempYearGroups, setTempYearGroups] = useState(customYearGroups);
   const [logoUploadStatus, setLogoUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
-  const [activeTab, setActiveTab] = useState<'appearance' | 'data' | 'categories' | 'yeargroups'>('appearance');
+  const [activeTab, setActiveTab] = useState<'appearance' | 'data' | 'categories' | 'yeargroups' | 'classes'>('appearance');
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [newCategoryColor, setNewCategoryColor] = useState('#6B7280');
@@ -27,7 +27,6 @@ export function UserSettings({ isOpen, onClose }: UserSettingsProps) {
   const [newYearGroupColor, setNewYearGroupColor] = useState('#3B82F6');
   const [editingYearGroup, setEditingYearGroup] = useState<string | null>(null);
   const [draggedYearGroup, setDraggedYearGroup] = useState<string | null>(null);
-  // const [showAdminSettings, setShowAdminSettings] = useState(false);
 
   // Check if user is admin
   const isAdmin = user?.email === 'rob.reichstorer@gmail.com' || 
@@ -127,13 +126,6 @@ export function UserSettings({ isOpen, onClose }: UserSettingsProps) {
     setNewCategoryColor('#6B7280');
   };
 
-  // const handleUpdateCategory = (index: number, name: string, color: string) => {
-  //   const updatedCategories = [...tempCategories];
-  //   updatedCategories[index] = { ...updatedCategories[index], name, color };
-  //   setTempCategories(updatedCategories);
-  //   setEditingCategory(null);
-  // };
-
   const handleDeleteCategory = (index: number) => {
     if (confirm('Are you sure you want to delete this category? This may affect existing activities.')) {
       const updatedCategories = tempCategories.filter((_, i) => i !== index);
@@ -207,13 +199,6 @@ export function UserSettings({ isOpen, onClose }: UserSettingsProps) {
     setNewYearGroupName('');
     setNewYearGroupColor('#3B82F6');
   };
-
-  // const handleUpdateYearGroup = (index: number, id: string, name: string, color: string) => {
-  //   const updatedYearGroups = [...tempYearGroups];
-  //   updatedYearGroups[index] = { ...updatedYearGroups[index], id, name, color };
-  //   setTempYearGroups(updatedYearGroups);
-  //   setEditingYearGroup(null);
-  // };
 
   const handleDeleteYearGroup = (index: number) => {
     if (confirm('Are you sure you want to delete this year group? This may affect existing lessons.')) {
@@ -312,6 +297,18 @@ export function UserSettings({ isOpen, onClose }: UserSettingsProps) {
           >
             Activity Categories
           </button>
+          {isAdmin && (
+            <button
+              onClick={() => setActiveTab('classes')}
+              className={`px-6 py-3 font-medium text-sm transition-colors duration-200 ${
+                activeTab === 'classes' 
+                  ? 'border-b-2 border-blue-600 text-blue-600' 
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Class Management
+            </button>
+          )}
           {isAdmin && (
             <button
               onClick={() => setActiveTab('data')}
@@ -622,10 +619,7 @@ export function UserSettings({ isOpen, onClose }: UserSettingsProps) {
 
           {activeTab === 'yeargroups' && (
             <>
-              {/* Subject Management Section - commented out for now */}
-              {/* <SubjectManagement /> */}
-              
-              {/* Your existing Year Group Management */}
+              {/* Year Group Management */}
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center space-x-3">
@@ -766,6 +760,7 @@ export function UserSettings({ isOpen, onClose }: UserSettingsProps) {
                                 </button>
                               </div>
                             </div>
+
                           </div>
                         ) : (
                           <div className="flex items-center space-x-3">
@@ -963,6 +958,13 @@ export function UserSettings({ isOpen, onClose }: UserSettingsProps) {
                 </div>
               </div>
             </>
+          )}
+
+          {activeTab === 'classes' && isAdmin && (
+            <ClassManagement 
+              isOpen={true} 
+              onClose={() => {}} 
+            />
           )}
 
           {activeTab === 'data' && isAdmin && (
