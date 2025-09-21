@@ -1,0 +1,674 @@
+{
+  "eyfs": {
+    "name": "Early Years Foundation Stage",
+    "domains": {
+      "Communication and Language": {
+        "Listening and Attention": [
+          "Listens to others one to one or in small groups, when conversation interests them",
+          "Listens to stories with increasing attention and recall",
+          "Joins in with repeated refrains and anticipates key events and phrases in rhymes and stories",
+          "Focuses attention - still listen or do, but can shift own attention",
+          "Is able to follow directions (if not intently focused on own choice of activity)"
+        ],
+        "Understanding": [
+          "Responds to simple instructions, e.g. to get or put away an object",
+          "Beginning to understand 'why' and 'how' questions",
+          "Understands 'who', 'what', 'where' in simple questions (e.g. Who's that/can? What's that? Where is.?).",
+          "Developing understanding of simple concepts (e.g. big/little)",
+          "Understands use of objects (e.g. 'What do we use to cut things?')"
+        ],
+        "Speaking": [
+          "Uses single words",
+          "Uses simple sentences",
+          "Can retell a simple past event in correct order (e.g. went down slide, hurt finger)",
+          "Uses talk to connect ideas, explain what is happening and anticipate what might happen next",
+          "Uses talk in pretending that objects stand for something else in play (e.g. 'This box is my castle')"
+        ]
+      },
+      "Physical Development": {
+        "Moving and Handling": [
+          "Moves freely and with pleasure and confidence in a range of ways, such as slithering, shuffling, rolling, crawling, walking, running, jumping, skipping, sliding and hopping",
+          "Mounts stairs, steps or climbing equipment using alternate feet",
+          "Walks downstairs, two feet to each step while carrying a small object",
+          "Runs skilfully and negotiates space successfully, adjusting speed or direction to avoid obstacles",
+          "Can stand momentarily on one foot when shown"
+        ],
+        "Health and Self-care": [
+          "Can tell adults when hungry or tired or when they want to play or sleep",
+          "Can usually manage washing and drying hands",
+          "Dresses with help, e.g. puts arms into open-fronted coat or shirt when held up",
+          "Can usually manage washing and drying hands",
+          "Shows understanding of the need for safety when tackling new challenges, and considers and manages some risks"
+        ]
+      },
+      "Personal, Social and Emotional Development": {
+        "Self-confidence and Self-awareness": [
+          "Can select and use activities and resources with help",
+          "Welcomes and values praise for what they have done",
+          "Enjoys responsibility of carrying out small tasks",
+          "Is more outgoing towards unfamiliar people and more confident in new social situations",
+          "Confident to talk to other children when playing, and will communicate freely about own home and community"
+        ],
+        "Managing Feelings and Behaviour": [
+          "Aware of own feelings, and knows that some actions and words can hurt others' feelings",
+          "Begins to accept the needs of others and can take turns and share resources, sometimes with support",
+          "Can usually tolerate delay when needs are not immediately met, and understands wishes may not always be met",
+          "Can usually adapt behaviour to different events, social situations and changes in routine",
+          "Shows understanding and follows the rules"
+        ],
+        "Making Relationships": [
+          "Can play in a group, extending and elaborating play ideas, e.g. building up a role-play activity with other children",
+          "Initiates play, offering cues to peers to join them",
+          "Keeps play going by responding to what others are saying or doing",
+          "Demonstrates friendly behaviour, initiating conversations and forming good relationships with peers and familiar adults",
+          "Can play cooperatively, taking turns with others"
+        ]
+      },
+      "Literacy": {
+        "Reading": [
+          "Enjoys rhyming and rhythmic activities",
+          "Shows awareness of rhyme and alliteration",
+          "Recognises rhythm in spoken words",
+          "Listens to and joins in with stories and poems, one-to-one and also in small groups",
+          "Joins in with repeated refrains and anticipates key events and phrases in rhymes and stories"
+        ],
+        "Writing": [
+          "Distinguishes between the different marks they make",
+          "Sometimes gives meaning to marks as they draw and paint",
+          "Ascribes meanings to marks that they see in different places",
+          "Gives meaning to marks they make as they draw, write and paint",
+          "Begins to break the flow of speech into words"
+        ]
+      },
+      "Mathematics": {
+        "Numbers": [
+          "Recites numbers in order to 10",
+          "Knows that numbers identify how many objects are in a set",
+          "Beginning to represent numbers using fingers, marks on paper or pictures",
+          "Sometimes matches numeral and quantity correctly",
+          "Shows curiosity about numbers by offering comments or asking questions"
+        ],
+        "Shape, Space and Measures": [
+          "Shows an interest in shape and space by playing with shapes or making arrangements with objects",
+          "Shows awareness of similarities of shapes in the environment",
+          "Uses positional language",
+          "Shows interest in shape by sustained construction activity or by talking about shapes or arrangements",
+          "Shows interest in shapes in the environment"
+        ]
+      },
+      "Understanding the World": {
+        "People and Communities": [
+          "Shows interest in the lives of people who are familiar to them",
+          "Remembers and talks about significant events in their own experience",
+          "Recognises and describes special times or events for family or friends",
+          "Shows interest in different occupations and ways of life",
+          "Knows some of the things that make them unique, and can talk about some of the similarities and differences in relation to friends or family"
+        ],
+        "The World": [
+          "Comments and asks questions about aspects of their familiar world such as the place where they live or the natural world",
+          "Can talk about some of the things they have observed such as plants, animals, natural and found objects",
+          "Talks about why things happen and how things work",
+          "Develops an understanding of growth, decay and changes over time",
+          "Shows care and concern for living things and the environment"
+        ],
+        "Technology": [
+          "Recognises that a range of technology is used in places such as homes and schools",
+          "Selects and uses technology for particular purposes",
+          "Knows how to operate simple equipment",
+          "Shows an interest in technological toys with knobs or pulleys, or real objects such as cameras or mobile phones",
+          "Shows skill in making toys work by pressing parts or lifting flaps to achieve effects such as sound, movements or new images"
+        ]
+      },
+      "Expressive Arts and Design": {
+        "Exploring and Using Media and Materials": [
+          "Joins in singing favourite songs",
+          "Creates sounds by banging, shaking, tapping or blowing",
+          "Shows an interest in the way musical instruments sound",
+          "Experiments with blocks, colours and marks",
+          "Engages in imaginative role-play based on own first-hand experiences"
+        ],
+        "Being Imaginative": [
+          "Uses available resources to create props to support role-play",
+          "Captures experiences and responses with a range of media, such as music, dance and role-play",
+          "Uses what they have learnt about media and materials in original ways, thinking about uses and purposes",
+          "Represents their own ideas, thoughts and feelings through design and technology, art, music, dance, role-play and stories",
+          "Creates simple representations of events, people and objects"
+        ]
+      }
+    }
+  },
+  "music": {
+    "name": "Music",
+    "yearGroups": {
+      "Year 1": {
+        "domains": {
+          "Singing": [
+            "I can sing short songs in tune with expression.",
+            "I can remember and sing a simple song independently.",
+            "I can sing together in a group, keeping the pulse."
+          ],
+          "Listening & Appraising": [
+            "I can identify high and low sounds.",
+            "I can describe music using words like fast/slow, loud/quiet, happy/sad.",
+            "I can recognise simple rhythmic patterns in music."
+          ],
+          "Playing Instruments": [
+            "I can play simple rhythm patterns on percussion instruments.",
+            "I can play in time with a group.",
+            "I can follow simple musical instructions while playing."
+          ],
+          "Composing & Improvising": [
+            "I can create simple rhythms or melodies independently or in pairs.",
+            "I can repeat and develop my musical ideas.",
+            "I can respond to musical prompts with sounds or movement."
+          ],
+          "Expressive / Performance": [
+            "I can perform short pieces with clear start and finish.",
+            "I can express feelings or ideas through music.",
+            "I can listen and respond to others in a performance."
+          ]
+        }
+      },
+      "Year 2": {
+        "domains": {
+          "Singing": [
+            "I can sing songs with clear pitch and dynamics.",
+            "I can sing in unison and begin simple two-part songs.",
+            "I can sing independently with confidence."
+          ],
+          "Listening & Appraising": [
+            "I can identify instruments by their sound.",
+            "I can recognise rhythmic patterns and tempo changes.",
+            "I can describe music using musical vocabulary (loud, soft, fast, slow, high, low)."
+          ],
+          "Playing Instruments": [
+            "I can play melodies on tuned percussion instruments.",
+            "I can play rhythmic patterns in a group with accuracy.",
+            "I can follow simple notation symbols while playing."
+          ],
+          "Composing & Improvising": [
+            "I can create simple compositions using rhythms and pitches.",
+            "I can improvise simple rhythmic or melodic phrases.",
+            "I can combine sounds to create simple musical textures."
+          ],
+          "Expressive / Performance": [
+            "I can perform with expression and awareness of others.",
+            "I can respond to performance feedback and improve my work.",
+            "I can listen and follow directions in an ensemble."
+          ]
+        }
+      },
+      "Year 3": {
+        "domains": {
+          "Singing": [
+            "I can sing songs confidently with a wider vocal range.",
+            "I can sing in harmony with others.",
+            "I can maintain a steady pulse while singing."
+          ],
+          "Listening & Appraising": [
+            "I can identify different musical styles and genres.",
+            "I can recognise melodic and rhythmic patterns by ear.",
+            "I can compare pieces of music and describe their features."
+          ],
+          "Playing Instruments": [
+            "I can play melodic phrases on tuned instruments.",
+            "I can perform in a small ensemble with control.",
+            "I can follow rhythmic notation accurately."
+          ],
+          "Composing & Improvising": [
+            "I can compose short melodies with rhythmic variation.",
+            "I can improvise rhythmic and melodic ideas in a group.",
+            "I can use dynamics and tempo in my compositions."
+          ],
+          "Expressive / Performance": [
+            "I can perform confidently in front of an audience.",
+            "I can express mood and character in my performance.",
+            "I can respond to constructive feedback to improve my performance."
+          ]
+        }
+      },
+      "Year 4": {
+        "domains": {
+          "Singing": [
+            "I can sing in two parts with accuracy.",
+            "I can control pitch and dynamics in longer songs.",
+            "I can sing expressively, showing understanding of the text."
+          ],
+          "Listening & Appraising": [
+            "I can identify features of different musical styles and periods.",
+            "I can describe music using technical vocabulary.",
+            "I can evaluate music, expressing preferences with reasons."
+          ],
+          "Playing Instruments": [
+            "I can perform melodies and accompaniments with control.",
+            "I can play as part of a larger ensemble, keeping in time.",
+            "I can read and interpret simple staff notation."
+          ],
+          "Composing & Improvising": [
+            "I can compose short pieces using rhythm, pitch, dynamics, and texture.",
+            "I can improvise melodic and rhythmic ideas within a given structure.",
+            "I can organise my compositions to include contrast and repetition."
+          ],
+          "Expressive / Performance": [
+            "I can perform with accuracy, expression, and confidence.",
+            "I can respond to audience and peer feedback to improve my work.",
+            "I can perform confidently as part of an ensemble."
+          ]
+        }
+      },
+      "Year 5": {
+        "domains": {
+          "Singing": [
+            "I can sing confidently in harmony and in different styles.",
+            "I can maintain pitch and phrasing in challenging songs.",
+            "I can express mood and character through singing."
+          ],
+          "Listening & Appraising": [
+            "I can identify key features of music from different cultures and historical periods.",
+            "I can explain how elements of music create effects and emotions.",
+            "I can compare, contrast, and evaluate pieces of music critically."
+          ],
+          "Playing Instruments": [
+            "I can perform complex rhythmic and melodic pieces accurately.",
+            "I can play confidently in ensembles, leading or supporting as needed.",
+            "I can read and interpret standard notation for melody and rhythm."
+          ],
+          "Composing & Improvising": [
+            "I can create and structure compositions with multiple parts and dynamics.",
+            "I can improvise melodic and rhythmic ideas independently and in groups.",
+            "I can refine my compositions based on feedback."
+          ],
+          "Expressive / Performance": [
+            "I can perform confidently and expressively in front of an audience.",
+            "I can communicate musical ideas clearly and respond to ensemble cues.",
+            "I can evaluate my own and others' performances using technical language."
+          ]
+        }
+      },
+      "Year 6": {
+        "domains": {
+          "Singing": [
+            "I can sing confidently in a variety of styles and parts, including harmony.",
+            "I can maintain pitch, dynamics, and expression over extended songs.",
+            "I can interpret the text and emotion of songs through performance."
+          ],
+          "Listening & Appraising": [
+            "I can analyse and compare music from different cultures and historical periods.",
+            "I can explain the effect of musical elements on the listener.",
+            "I can make informed judgments and support opinions with reasons."
+          ],
+          "Playing Instruments": [
+            "I can perform complex ensemble pieces with confidence and accuracy.",
+            "I can lead sections and collaborate effectively in ensembles.",
+            "I can sight-read simple notation fluently."
+          ],
+          "Composing & Improvising": [
+            "I can compose extended pieces with clear structure, texture, and dynamics.",
+            "I can improvise with creativity, using appropriate pitch and rhythm.",
+            "I can evaluate and refine compositions to improve musical effect."
+          ],
+          "Expressive / Performance": [
+            "I can perform expressively to a range of audiences with confidence.",
+            "I can respond to ensemble and audience feedback to enhance performance.",
+            "I can communicate musical ideas effectively as a soloist and ensemble member."
+          ]
+        }
+      }
+    }
+  },
+  "drama": {
+    "name": "Drama",
+    "yearGroups": {
+      "Reception": {
+        "domains": {
+          "Speaking and Listening": [
+            "I can use my voice to express different emotions and characters.",
+            "I can listen carefully to others and respond appropriately.",
+            "I can take turns in group discussions and activities."
+          ],
+          "Movement and Gesture": [
+            "I can use my body to show different characters and emotions.",
+            "I can move in different ways to show different feelings.",
+            "I can use simple gestures to communicate meaning."
+          ],
+          "Role Play": [
+            "I can pretend to be different characters in familiar situations.",
+            "I can use props and costumes to help me become a character.",
+            "I can work with others to create simple stories."
+          ],
+          "Performance": [
+            "I can perform simple actions and movements for others.",
+            "I can show my work to the class with confidence.",
+            "I can listen to feedback and try to improve my work."
+          ]
+        }
+      },
+      "Year 1": {
+        "domains": {
+          "Speaking and Listening": [
+            "I can use my voice clearly and expressively to tell stories.",
+            "I can listen carefully to others and ask relevant questions.",
+            "I can speak with confidence in front of a small group."
+          ],
+          "Movement and Gesture": [
+            "I can use my body to create different characters and moods.",
+            "I can move in time with music or rhythm.",
+            "I can use facial expressions to show emotions."
+          ],
+          "Role Play": [
+            "I can stay in character during short performances.",
+            "I can work with others to create simple scenes.",
+            "I can use dialogue to develop characters."
+          ],
+          "Performance": [
+            "I can perform short pieces with clear beginning, middle and end.",
+            "I can project my voice so others can hear me.",
+            "I can work as part of a group to create performances."
+          ]
+        }
+      },
+      "Year 2": {
+        "domains": {
+          "Speaking and Listening": [
+            "I can use different voices for different characters.",
+            "I can listen carefully and respond thoughtfully to others.",
+            "I can speak clearly and confidently in front of the class."
+          ],
+          "Movement and Gesture": [
+            "I can use movement to tell stories and express ideas.",
+            "I can create simple dance sequences to music.",
+            "I can use space effectively in performances."
+          ],
+          "Role Play": [
+            "I can develop characters with clear personalities.",
+            "I can improvise dialogue and actions.",
+            "I can work collaboratively to create longer scenes."
+          ],
+          "Performance": [
+            "I can perform with expression and confidence.",
+            "I can use props and costumes to enhance my performance.",
+            "I can give and receive feedback to improve my work."
+          ]
+        }
+      },
+      "Year 3": {
+        "domains": {
+          "Speaking and Listening": [
+            "I can use a range of vocal techniques to create different effects.",
+            "I can listen actively and contribute meaningfully to discussions.",
+            "I can speak with confidence and clarity to different audiences."
+          ],
+          "Movement and Gesture": [
+            "I can use movement to convey complex emotions and ideas.",
+            "I can create and perform dance sequences with others.",
+            "I can use levels and space creatively in performances."
+          ],
+          "Role Play": [
+            "I can develop complex characters with clear motivations.",
+            "I can improvise extended scenes with others.",
+            "I can use different dramatic techniques to tell stories."
+          ],
+          "Performance": [
+            "I can perform with confidence and expression to an audience.",
+            "I can work effectively as part of an ensemble.",
+            "I can evaluate my own and others' performances constructively."
+          ]
+        }
+      },
+      "Year 4": {
+        "domains": {
+          "Speaking and Listening": [
+            "I can use advanced vocal techniques to create atmosphere and mood.",
+            "I can listen critically and respond with insight.",
+            "I can adapt my speaking style for different purposes and audiences."
+          ],
+          "Movement and Gesture": [
+            "I can use movement to create powerful dramatic effects.",
+            "I can choreograph and perform complex movement sequences.",
+            "I can use physical theatre techniques effectively."
+          ],
+          "Role Play": [
+            "I can create and sustain complex characters over extended performances.",
+            "I can use improvisation to develop and explore ideas.",
+            "I can work collaboratively to create sophisticated dramatic pieces."
+          ],
+          "Performance": [
+            "I can perform with technical skill and artistic expression.",
+            "I can direct and support others in performances.",
+            "I can reflect critically on performances and suggest improvements."
+          ]
+        }
+      },
+      "Year 5": {
+        "domains": {
+          "Speaking and Listening": [
+            "I can use sophisticated vocal techniques to create powerful performances.",
+            "I can listen with empathy and respond with sensitivity.",
+            "I can speak with authority and conviction on complex topics."
+          ],
+          "Movement and Gesture": [
+            "I can use movement to create compelling narratives.",
+            "I can perform complex physical theatre with precision.",
+            "I can use space and levels to create dramatic impact."
+          ],
+          "Role Play": [
+            "I can create multi-layered characters with depth and complexity.",
+            "I can use advanced improvisation techniques to develop work.",
+            "I can lead collaborative creative processes."
+          ],
+          "Performance": [
+            "I can perform with professional-level skill and artistry.",
+            "I can create and direct original dramatic works.",
+            "I can provide expert feedback and mentoring to others."
+          ]
+        }
+      },
+      "Year 6": {
+        "domains": {
+          "Speaking and Listening": [
+            "I can use advanced vocal techniques to create compelling performances.",
+            "I can listen with critical awareness and respond with insight.",
+            "I can speak with confidence and authority to any audience."
+          ],
+          "Movement and Gesture": [
+            "I can use movement to create sophisticated dramatic narratives.",
+            "I can perform complex physical theatre with artistic excellence.",
+            "I can use space, levels, and movement to create powerful dramatic effects."
+          ],
+          "Role Play": [
+            "I can create complex, multi-dimensional characters with psychological depth.",
+            "I can use advanced improvisation and devising techniques.",
+            "I can lead and inspire others in collaborative creative processes."
+          ],
+          "Performance": [
+            "I can perform with professional excellence and artistic integrity.",
+            "I can create, direct, and produce original dramatic works.",
+            "I can provide expert analysis, feedback, and mentoring to others."
+          ]
+        }
+      }
+    }
+  },
+  "music": {
+    "name": "Music",
+    "yearGroups": {
+      "Year 1": {
+        "domains": {
+          "Singing": [
+            "I can sing short songs in tune with expression.",
+            "I can remember and sing a simple song independently.",
+            "I can sing together in a group, keeping the pulse."
+          ],
+          "Listening & Appraising": [
+            "I can identify high and low sounds.",
+            "I can describe music using words like fast/slow, loud/quiet, happy/sad.",
+            "I can recognise simple rhythmic patterns in music."
+          ],
+          "Playing Instruments": [
+            "I can play simple rhythm patterns on percussion instruments.",
+            "I can play in time with a group.",
+            "I can follow simple musical instructions while playing."
+          ],
+          "Composing & Improvising": [
+            "I can create simple rhythms or melodies independently or in pairs.",
+            "I can repeat and develop my musical ideas.",
+            "I can respond to musical prompts with sounds or movement."
+          ],
+          "Expressive / Performance": [
+            "I can perform short pieces with clear start and finish.",
+            "I can express feelings or ideas through music.",
+            "I can listen and respond to others in a performance."
+          ]
+        }
+      },
+      "Year 2": {
+        "domains": {
+          "Singing": [
+            "I can sing songs with clear pitch and dynamics.",
+            "I can sing in unison and begin simple two-part songs.",
+            "I can sing independently with confidence."
+          ],
+          "Listening & Appraising": [
+            "I can identify instruments by their sound.",
+            "I can recognise rhythmic patterns and tempo changes.",
+            "I can describe music using musical vocabulary (loud, soft, fast, slow, high, low)."
+          ],
+          "Playing Instruments": [
+            "I can play melodies on tuned percussion instruments.",
+            "I can play rhythmic patterns in a group with accuracy.",
+            "I can follow simple notation symbols while playing."
+          ],
+          "Composing & Improvising": [
+            "I can create simple compositions using rhythms and pitches.",
+            "I can improvise simple rhythmic or melodic phrases.",
+            "I can combine sounds to create simple musical textures."
+          ],
+          "Expressive / Performance": [
+            "I can perform with expression and awareness of others.",
+            "I can respond to performance feedback and improve my work.",
+            "I can listen and follow directions in an ensemble."
+          ]
+        }
+      },
+      "Year 3": {
+        "domains": {
+          "Singing": [
+            "I can sing songs confidently with a wider vocal range.",
+            "I can sing in harmony with others.",
+            "I can maintain a steady pulse while singing."
+          ],
+          "Listening & Appraising": [
+            "I can identify different musical styles and genres.",
+            "I can recognise melodic and rhythmic patterns by ear.",
+            "I can compare pieces of music and describe their features."
+          ],
+          "Playing Instruments": [
+            "I can play melodic phrases on tuned instruments.",
+            "I can perform in a small ensemble with control.",
+            "I can follow rhythmic notation accurately."
+          ],
+          "Composing & Improvising": [
+            "I can compose short melodies with rhythmic variation.",
+            "I can improvise rhythmic and melodic ideas in a group.",
+            "I can use dynamics and tempo in my compositions."
+          ],
+          "Expressive / Performance": [
+            "I can perform confidently in front of an audience.",
+            "I can express mood and character in my performance.",
+            "I can respond to constructive feedback to improve my performance."
+          ]
+        }
+      },
+      "Year 4": {
+        "domains": {
+          "Singing": [
+            "I can sing in two parts with accuracy.",
+            "I can control pitch and dynamics in longer songs.",
+            "I can sing expressively, showing understanding of the text."
+          ],
+          "Listening & Appraising": [
+            "I can identify features of different musical styles and periods.",
+            "I can describe music using technical vocabulary.",
+            "I can evaluate music, expressing preferences with reasons."
+          ],
+          "Playing Instruments": [
+            "I can perform melodies and accompaniments with control.",
+            "I can play as part of a larger ensemble, keeping in time.",
+            "I can read and interpret simple staff notation."
+          ],
+          "Composing & Improvising": [
+            "I can compose short pieces using rhythm, pitch, dynamics, and texture.",
+            "I can improvise melodic and rhythmic ideas within a given structure.",
+            "I can organise my compositions to include contrast and repetition."
+          ],
+          "Expressive / Performance": [
+            "I can perform with accuracy, expression, and confidence.",
+            "I can respond to audience and peer feedback to improve my work.",
+            "I can perform confidently as part of an ensemble."
+          ]
+        }
+      },
+      "Year 5": {
+        "domains": {
+          "Singing": [
+            "I can sing confidently in harmony and in different styles.",
+            "I can maintain pitch and phrasing in challenging songs.",
+            "I can express mood and character through singing."
+          ],
+          "Listening & Appraising": [
+            "I can identify key features of music from different cultures and historical periods.",
+            "I can explain how elements of music create effects and emotions.",
+            "I can compare, contrast, and evaluate pieces of music critically."
+          ],
+          "Playing Instruments": [
+            "I can perform complex rhythmic and melodic pieces accurately.",
+            "I can play confidently in ensembles, leading or supporting as needed.",
+            "I can read and interpret standard notation for melody and rhythm."
+          ],
+          "Composing & Improvising": [
+            "I can create and structure compositions with multiple parts and dynamics.",
+            "I can improvise melodic and rhythmic ideas independently and in groups.",
+            "I can refine my compositions based on feedback."
+          ],
+          "Expressive / Performance": [
+            "I can perform confidently and expressively in front of an audience.",
+            "I can communicate musical ideas clearly and respond to ensemble cues.",
+            "I can evaluate my own and others' performances using technical language."
+          ]
+        }
+      },
+      "Year 6": {
+        "domains": {
+          "Singing": [
+            "I can sing confidently in a variety of styles and parts, including harmony.",
+            "I can maintain pitch, dynamics, and expression over extended songs.",
+            "I can interpret the text and emotion of songs through performance."
+          ],
+          "Listening & Appraising": [
+            "I can analyse and compare music from different cultures and historical periods.",
+            "I can explain the effect of musical elements on the listener.",
+            "I can make informed judgments and support opinions with reasons."
+          ],
+          "Playing Instruments": [
+            "I can perform complex ensemble pieces with confidence and accuracy.",
+            "I can lead sections and collaborate effectively in ensembles.",
+            "I can sight-read simple notation fluently."
+          ],
+          "Composing & Improvising": [
+            "I can compose extended pieces with clear structure, texture, and dynamics.",
+            "I can improvise with creativity, using appropriate pitch and rhythm.",
+            "I can evaluate and refine compositions to improve musical effect."
+          ],
+          "Expressive / Performance": [
+            "I can perform expressively to a range of audiences with confidence.",
+            "I can respond to ensemble and audience feedback to enhance performance.",
+            "I can communicate musical ideas effectively as a soloist and ensemble member."
+          ]
+        }
+      }
+    }
+  }
+}
+
+
+

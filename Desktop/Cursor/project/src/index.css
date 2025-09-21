@@ -1,0 +1,248 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Color Scheme CSS Variables */
+:root {
+  --color-primary: #3B82F6;
+  --color-secondary: #1E40AF;
+  --color-accent: #60A5FA;
+  --color-background: #F8FAFC;
+}
+
+/* Ocean Blue (default) */
+.color-scheme-ocean {
+  --color-primary: #3B82F6;
+  --color-secondary: #1E40AF;
+  --color-accent: #60A5FA;
+  --color-background: #F8FAFC;
+}
+
+/* Forest Green */
+.color-scheme-forest {
+  --color-primary: #10B981;
+  --color-secondary: #047857;
+  --color-accent: #34D399;
+  --color-background: #F0FDF4;
+}
+
+/* Sunset Orange */
+.color-scheme-sunset {
+  --color-primary: #F59E0B;
+  --color-secondary: #D97706;
+  --color-accent: #FBBF24;
+  --color-background: #FFFBEB;
+}
+
+/* Royal Purple */
+.color-scheme-royal {
+  --color-primary: #8B5CF6;
+  --color-secondary: #7C3AED;
+  --color-accent: #A78BFA;
+  --color-background: #FAF5FF;
+}
+
+/* Rose Pink */
+.color-scheme-rose {
+  --color-primary: #EC4899;
+  --color-secondary: #DB2777;
+  --color-accent: #F472B6;
+  --color-background: #FDF2F8;
+}
+
+/* Teal Cyan */
+.color-scheme-teal {
+  --color-primary: #14B8A6;
+  --color-secondary: #0F766E;
+  --color-accent: #5EEAD4;
+  --color-background: #F0FDFA;
+}
+
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  70% {
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.5s ease-out;
+}
+
+/* Walkthrough guide highlight pulse effect */
+@keyframes highlight-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+.highlight-pulse {
+  animation: highlight-pulse 1.5s infinite;
+}
+
+/* Modal animations */
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-slide-in {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-overlay {
+  animation: modal-fade-in 0.3s ease-out;
+}
+
+.modal-content {
+  animation: modal-slide-in 0.3s ease-out;
+}
+
+/* Responsive modal sizing */
+@media (min-width: 640px) {
+  .modal-responsive {
+    max-width: 90%;
+    width: 600px;
+  }
+}
+
+@media (min-width: 768px) {
+  .modal-responsive {
+    max-width: 80%;
+    width: 700px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .modal-responsive {
+    max-width: 70%;
+    width: 800px;
+  }
+}
+
+/* Fix for dropdown menus */
+.z-50 {
+  z-index: 50 !important;
+}
+
+/* Ensure dropdowns are above other elements */
+.dropdown-menu {
+  z-index: 100 !important;
+  position: absolute !important;
+}
+
+/* Fix for assign to half-term dropdown */
+.dropdown-menu {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  min-width: 12rem;
+  overflow: hidden;
+}
+
+.dropdown-menu h3 {
+  font-weight: 500;
+  color: #374151;
+}
+
+.dropdown-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: #4b5563;
+  transition: all 0.2s;
+}
+
+.dropdown-menu button:hover {
+  background-color: #eff6ff;
+  color: #1e40af;
+}
+
+/* Print styles for lesson plans */
+@media print {
+  body {
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  .pageNumber:before {
+    content: counter(page);
+  }
+  
+  .page-break-inside-avoid {
+    page-break-inside: avoid;
+  }
+  
+  /* Make sure the print content is visible */
+  .print-content {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: static !important;
+    overflow: visible !important;
+    max-height: none !important;
+  }
+  
+  /* Hide everything except the print content */
+  body > *:not(.print-content) {
+    display: none !important;
+  }
+  
+  /* Ensure proper page breaks */
+  h2, h3 {
+    page-break-after: avoid;
+  }
+  
+  /* Circular activity boxes */
+  .print-activity {
+    border-radius: 1rem;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+    page-break-inside: avoid;
+  }
+  
+  /* Force page breaks between lessons */
+  .lesson-page-break {
+    page-break-after: always;
+  }
+  
+  /* Ensure footer appears on every page */
+  .page-footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #6b7280;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 0.5rem;
+  }
+}
