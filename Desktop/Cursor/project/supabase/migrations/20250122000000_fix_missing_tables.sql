@@ -93,3 +93,8 @@ VALUES
   ('UKG', 'Upper Kindergarten', 'Upper Kindergarten class', '#3B82F6', true),
   ('Reception', 'Reception', 'Reception class', '#8B5CF6', true)
 ON CONFLICT (name) DO NOTHING;
+
+
+
+
+

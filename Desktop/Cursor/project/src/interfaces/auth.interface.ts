@@ -56,3 +56,8 @@ export interface IRoleService {
   canManageRole: (managerRole: UserRole, targetRole: UserRole) => boolean;
 }
 
+
+
+
+
+

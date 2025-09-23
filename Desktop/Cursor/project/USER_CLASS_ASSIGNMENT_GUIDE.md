@@ -153,3 +153,8 @@ const getAvailableClasses = (purchasedItems: string[]) => {
 
 *This system ensures proper access control while maintaining a smooth user experience for both administrators and end users.*
 
+
+
+
+
+

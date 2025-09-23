@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Settings, Upload, Palette, School, RotateCcw, X, Check, Plus, Trash2, GripVertical, Edit3, Save, Users } from 'lucide-react';
 import { useSettings } from '../contexts/SettingsContext';
 import { DataSourceSettings } from './DataSourceSettings';
 import { ClassManagement } from './ClassManagement';
+import { CurriculumTargetsManagement } from './CurriculumTargetsManagement';
 import { useAuth } from '../hooks/useAuth';
+import { yearGroupsApi } from '../config/api';
 
 interface UserSettingsProps {
   isOpen: boolean;
@@ -17,7 +19,7 @@ export function UserSettings({ isOpen, onClose }: UserSettingsProps) {
   const [tempCategories, setTempCategories] = useState(categories);
   const [tempYearGroups, setTempYearGroups] = useState(customYearGroups);
   const [logoUploadStatus, setLogoUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
-  const [activeTab, setActiveTab] = useState<'appearance' | 'data' | 'categories' | 'yeargroups' | 'classes'>('appearance');
+  const [activeTab, setActiveTab] = useState<'appearance' | 'curriculum' | 'data'>('appearance');
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [newCategoryColor, setNewCategoryColor] = useState('#6B7280');
@@ -27,6 +29,17 @@ export function UserSettings({ isOpen, onClose }: UserSettingsProps) {
   const [newYearGroupColor, setNewYearGroupColor] = useState('#3B82F6');
   const [editingYearGroup, setEditingYearGroup] = useState<string | null>(null);
   const [draggedYearGroup, setDraggedYearGroup] = useState<string | null>(null);
+  const [isLoadingYearGroups, setIsLoadingYearGroups] = useState(false);
+  const [yearGroupError, setYearGroupError] = useState<string | null>(null);
+  
+  // Category assignment state
+  const [selectedClass, setSelectedClass] = useState<string>('');
+  const [selectedCategoriesForClass, setSelectedCategoriesForClass] = useState<Set<string>>(new Set());
+  const [selectedCategoryElements, setSelectedCategoryElements] = useState<Set<string>>(new Set());
+  const [classCategoryAssignments, setClassCategoryAssignments] = useState<Record<string, {
+    categories: string[];
+    elements: string[];
+  }>>({});
 
   // Check if user is admin
   const isAdmin = user?.email === 'rob.reichstorer@gmail.com' || 
@@ -46,6 +59,37 @@ export function UserSettings({ isOpen, onClose }: UserSettingsProps) {
   React.useEffect(() => {
     setTempYearGroups(customYearGroups);
   }, [customYearGroups]);
+
+  // Load year groups from database on component mount
+  useEffect(() => {
+    const loadYearGroupsFromDatabase = async () => {
+      if (!isOpen) return;
+      
+      try {
+        setIsLoadingYearGroups(true);
+        setYearGroupError(null);
+        const dbYearGroups = await yearGroupsApi.getAll();
+        
+        if (dbYearGroups && dbYearGroups.length > 0) {
+          // Convert database format to local format
+          const convertedYearGroups = dbYearGroups.map(group => ({
+            id: group.id,
+            name: group.name,
+            color: group.color
+          }));
+          setTempYearGroups(convertedYearGroups);
+          updateYearGroups(convertedYearGroups);
+        }
+      } catch (error) {
+        console.error('Failed to load year groups from database:', error);
+        setYearGroupError('Failed to load year groups from database');
+      } finally {
+        setIsLoadingYearGroups(false);
+      }
+    };
+
+    loadYearGroupsFromDatabase();
+  }, [isOpen, updateYearGroups]);
 
   const handleSave = () => {
     updateSettings(tempSettings);
@@ -175,7 +219,7 @@ export function UserSettings({ isOpen, onClose }: UserSettingsProps) {
   };
 
   // Year Group Management
-  const handleAddYearGroup = () => {
+  const handleAddYearGroup = async () => {
     if (!newYearGroupId.trim() || !newYearGroupName.trim()) return;
     
     // Check if year group already exists
@@ -184,26 +228,63 @@ export function UserSettings({ isOpen, onClose }: UserSettingsProps) {
       return;
     }
     
-    // Add new year group
-    setTempYearGroups([
-      ...tempYearGroups,
-      {
+    try {
+      setIsLoadingYearGroups(true);
+      setYearGroupError(null);
+      
+      // Create in database
+      const newYearGroup = await yearGroupsApi.create({
         id: newYearGroupId,
         name: newYearGroupName,
         color: newYearGroupColor
-      }
-    ]);
-    
-    // Reset form
-    setNewYearGroupId('');
-    setNewYearGroupName('');
-    setNewYearGroupColor('#3B82F6');
+      });
+      
+      // Update local state
+      const updatedYearGroups = [
+        ...tempYearGroups,
+        {
+          id: newYearGroup.id,
+          name: newYearGroup.name,
+          color: newYearGroup.color
+        }
+      ];
+      
+      setTempYearGroups(updatedYearGroups);
+      updateYearGroups(updatedYearGroups);
+      
+      // Reset form
+      setNewYearGroupId('');
+      setNewYearGroupName('');
+      setNewYearGroupColor('#3B82F6');
+    } catch (error) {
+      console.error('Failed to create year group:', error);
+      setYearGroupError('Failed to create year group');
+    } finally {
+      setIsLoadingYearGroups(false);
+    }
   };
 
-  const handleDeleteYearGroup = (index: number) => {
+  const handleDeleteYearGroup = async (index: number) => {
     if (confirm('Are you sure you want to delete this year group? This may affect existing lessons.')) {
-      const updatedYearGroups = tempYearGroups.filter((_, i) => i !== index);
-      setTempYearGroups(updatedYearGroups);
+      const yearGroupToDelete = tempYearGroups[index];
+      
+      try {
+        setIsLoadingYearGroups(true);
+        setYearGroupError(null);
+        
+        // Delete from database
+        await yearGroupsApi.delete(yearGroupToDelete.id);
+        
+        // Update local state
+        const updatedYearGroups = tempYearGroups.filter((_, i) => i !== index);
+        setTempYearGroups(updatedYearGroups);
+        updateYearGroups(updatedYearGroups);
+      } catch (error) {
+        console.error('Failed to delete year group:', error);
+        setYearGroupError('Failed to delete year group');
+      } finally {
+        setIsLoadingYearGroups(false);
+      }
     }
   };
 
@@ -211,7 +292,7 @@ export function UserSettings({ isOpen, onClose }: UserSettingsProps) {
     setDraggedYearGroup(yearGroupId);
   };
 
-  const handleYearGroupDragOver = (e: React.DragEvent, targetYearGroupId: string) => {
+  const handleYearGroupDragOver = async (e: React.DragEvent, targetYearGroupId: string) => {
     e.preventDefault();
     if (!draggedYearGroup || draggedYearGroup === targetYearGroupId) return;
     
@@ -220,22 +301,122 @@ export function UserSettings({ isOpen, onClose }: UserSettingsProps) {
     
     if (draggedIndex === -1 || targetIndex === -1) return;
     
-    // Reorder year groups
+    // Reorder year groups locally first
     const newYearGroups = [...tempYearGroups];
     const [removed] = newYearGroups.splice(draggedIndex, 1);
     newYearGroups.splice(targetIndex, 0, removed);
     
     setTempYearGroups(newYearGroups);
+    
+    // Update database with new order
+    try {
+      const orderedIds = newYearGroups.map(group => group.id);
+      await yearGroupsApi.reorder(orderedIds);
+    } catch (error) {
+      console.error('Failed to reorder year groups:', error);
+      setYearGroupError('Failed to reorder year groups');
+    }
   };
 
   const handleYearGroupDragEnd = () => {
     setDraggedYearGroup(null);
   };
 
-  const handleResetYearGroups = () => {
+  const handleUpdateYearGroup = async (index: number, id: string, name: string, color: string) => {
+    try {
+      setIsLoadingYearGroups(true);
+      setYearGroupError(null);
+      
+      // Update in database
+      await yearGroupsApi.update(id, { name, color });
+      
+      // Update local state
+      const updatedYearGroups = [...tempYearGroups];
+      updatedYearGroups[index] = { id, name, color };
+      setTempYearGroups(updatedYearGroups);
+      updateYearGroups(updatedYearGroups);
+      
+      setEditingYearGroup(null);
+    } catch (error) {
+      console.error('Failed to update year group:', error);
+      setYearGroupError('Failed to update year group');
+    } finally {
+      setIsLoadingYearGroups(false);
+    }
+  };
+
+  const handleResetYearGroups = async () => {
     if (confirm('Are you sure you want to reset year groups to defaults? This cannot be undone.')) {
-      resetYearGroupsToDefaults();
-      setTempYearGroups(customYearGroups);
+      try {
+        setIsLoadingYearGroups(true);
+        setYearGroupError(null);
+        
+        // Reset to defaults locally
+        resetYearGroupsToDefaults();
+        setTempYearGroups(customYearGroups);
+        
+        // Note: In a real implementation, you might want to delete all custom year groups from database
+        // and recreate the defaults, but for now we'll just reset locally
+      } catch (error) {
+        console.error('Failed to reset year groups:', error);
+        setYearGroupError('Failed to reset year groups');
+      } finally {
+        setIsLoadingYearGroups(false);
+      }
+    }
+  };
+
+  // Category assignment functions
+  const getCategoryElements = (categoryName: string): string[] => {
+    // Music and Drama specific elements for different year groups
+    const categoryElements: Record<string, string[]> = {
+      'Music': [
+        'Singing & Voice', 'Rhythm & Beat', 'Melody & Tune', 'Instruments', 
+        'Music Theory', 'Composition', 'Performance', 'Listening Skills',
+        'Musical Games', 'Sound Exploration', 'Musical Stories', 'Dance & Movement'
+      ],
+      'Drama': [
+        'Role Play', 'Character Development', 'Storytelling', 'Improvisation',
+        'Voice & Speech', 'Movement & Gesture', 'Props & Costumes', 'Stage Presence',
+        'Group Work', 'Creative Expression', 'Emotional Expression', 'Performance Skills'
+      ]
+    };
+    
+    return categoryElements[categoryName] || [];
+  };
+
+  const handleSaveCategoryAssignment = () => {
+    if (!selectedClass || selectedCategoriesForClass.size === 0) return;
+    
+    const assignment = {
+      categories: Array.from(selectedCategoriesForClass),
+      elements: Array.from(selectedCategoryElements)
+    };
+    
+    setClassCategoryAssignments(prev => ({
+      ...prev,
+      [selectedClass]: assignment
+    }));
+    
+    // Reset selection
+    setSelectedClass('');
+    setSelectedCategoriesForClass(new Set());
+    setSelectedCategoryElements(new Set());
+    
+    // Show success message
+    alert(`Categories assigned successfully to ${tempYearGroups.find(yg => yg.id === selectedClass)?.name}!`);
+  };
+
+  const handleLoadClassAssignment = (classId: string) => {
+    const assignment = classCategoryAssignments[classId];
+    if (assignment) {
+      setSelectedClass(classId);
+      setSelectedCategoriesForClass(new Set(assignment.categories));
+      setSelectedCategoryElements(new Set(assignment.elements));
+    } else {
+      setSelectedClass(classId);
+      setSelectedCategoriesForClass(new Set());
+      setSelectedCategoryElements(new Set());
     }
   };
 
@@ -275,40 +456,18 @@ export function UserSettings({ isOpen, onClose }: UserSettingsProps) {
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
-            Appearance
+            Categories
           </button>
           <button
-            onClick={() => setActiveTab('yeargroups')}
+            onClick={() => setActiveTab('curriculum')}
             className={`px-6 py-3 font-medium text-sm transition-colors duration-200 ${
-              activeTab === 'yeargroups' 
+              activeTab === 'curriculum' 
                 ? 'border-b-2 border-blue-600 text-blue-600' 
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
-            Year Groups
+            Classes & Reading
           </button>
-          <button
-            onClick={() => setActiveTab('categories')}
-            className={`px-6 py-3 font-medium text-sm transition-colors duration-200 ${
-              activeTab === 'categories' 
-                ? 'border-b-2 border-blue-600 text-blue-600' 
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Activity Categories
-          </button>
-          {isAdmin && (
-            <button
-              onClick={() => setActiveTab('classes')}
-              className={`px-6 py-3 font-medium text-sm transition-colors duration-200 ${
-                activeTab === 'classes' 
-                  ? 'border-b-2 border-blue-600 text-blue-600' 
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              Class Management
-            </button>
-          )}
           {isAdmin && (
             <button
               onClick={() => setActiveTab('data')}
@@ -318,7 +477,7 @@ export function UserSettings({ isOpen, onClose }: UserSettingsProps) {
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              Data Management
+              Data & Classes
             </button>
           )}
         </div>
@@ -327,501 +486,7 @@ export function UserSettings({ isOpen, onClose }: UserSettingsProps) {
         <div className="flex-1 overflow-y-auto p-6 space-y-8">
           {activeTab === 'appearance' && (
             <>
-              {/* School Information */}
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-                <div className="flex items-center space-x-3 mb-6">
-                  <School className="h-6 w-6 text-blue-600" />
-                  <h3 className="text-lg font-semibold text-gray-900">School Information</h3>
-                </div>
-
-                <div className="space-y-6">
-                  {/* School Name */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      School Name
-                    </label>
-                    <input
-                      type="text"
-                      value={tempSettings.schoolName}
-                      onChange={(e) => setTempSettings(prev => ({ ...prev, schoolName: e.target.value }))}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                      placeholder="Enter your school name"
-                      dir="ltr"
-                    />
-                  </div>
-
-                  {/* School Logo */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-4">
-                      School Logo
-                    </label>
-                    
-                    {/* Current Logo Preview */}
-                    <div className="flex items-center space-x-6 mb-4">
-                      <div className="flex-shrink-0">
-                        <img
-                          src={tempSettings.schoolLogo}
-                          alt="School Logo"
-                          className="w-20 h-20 rounded-xl object-cover border border-gray-200 shadow-sm"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm text-gray-600 mb-3">
-                          Upload a custom logo or choose from presets below
-                        </p>
-                        
-                        {/* Upload Button */}
-                        <div className="relative">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleLogoUpload}
-                            disabled={logoUploadStatus === 'uploading'}
-                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                          />
-                          <button
-                            disabled={logoUploadStatus === 'uploading'}
-                            className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-lg transition-colors duration-200"
-                          >
-                            <Upload className="h-4 w-4" />
-                            <span>
-                              {logoUploadStatus === 'uploading' ? 'Uploading...' : 'Upload Logo'}
-                            </span>
-                          </button>
-                        </div>
-
-                        {/* Upload Status */}
-                        {logoUploadStatus === 'success' && (
-                          <div className="flex items-center space-x-2 text-green-600 mt-2">
-                            <Check className="h-4 w-4" />
-                            <span className="text-sm">Logo uploaded successfully!</span>
-                          </div>
-                        )}
-                        
-                        {logoUploadStatus === 'error' && (
-                          <div className="flex items-center space-x-2 text-red-600 mt-2">
-                            <X className="h-4 w-4" />
-                            <span className="text-sm">Upload failed. Please try again.</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Preset Logos */}
-                    <div>
-                      <p className="text-sm font-medium text-gray-700 mb-3">Or choose a preset:</p>
-                      <div className="grid grid-cols-4 gap-3">
-                        {presetLogos.map((logoUrl, index) => (
-                          <button
-                            key={index}
-                            onClick={() => setTempSettings(prev => ({ ...prev, schoolLogo: logoUrl }))}
-                            className={`relative group rounded-xl overflow-hidden border transition-all duration-200 ${
-                              tempSettings.schoolLogo === logoUrl
-                                ? 'border-blue-500 shadow-md'
-                                : 'border-gray-200 hover:border-blue-300 hover:shadow-sm'
-                            }`}
-                          >
-                            <img
-                              src={logoUrl}
-                              alt={`Preset ${index + 1}`}
-                              className="w-full h-16 object-cover"
-                            />
-                            {tempSettings.schoolLogo === logoUrl && (
-                              <div className="absolute inset-0 bg-blue-500 bg-opacity-20 flex items-center justify-center">
-                                <div className="bg-blue-500 rounded-full p-1">
-                                  <Check className="h-3 w-3 text-white" />
-                                </div>
-                              </div>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Theme Customization */}
-              <div className="bg-purple-50 border border-purple-200 rounded-xl p-6">
-                <div className="flex items-center space-x-3 mb-6">
-                  <Palette className="h-6 w-6 text-purple-600" />
-                  <h3 className="text-lg font-semibold text-gray-900">Theme Customization</h3>
-                </div>
-
-                <div className="space-y-6">
-                  {/* Custom Theme Toggle */}
-                  <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-purple-200">
-                    <div>
-                      <h4 className="font-medium text-gray-900">Custom Theme</h4>
-                      <p className="text-sm text-gray-600">
-                        Enable to use custom colors instead of automatic class-based themes
-                      </p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={tempSettings.customTheme}
-                        onChange={(e) => setTempSettings(prev => ({ ...prev, customTheme: e.target.checked }))}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-                    </label>
-                  </div>
-
-                  {/* Color Customization (only when custom theme is enabled) */}
-                  {tempSettings.customTheme && (
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {/* Primary Color */}
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Primary Color
-                          </label>
-                          <div className="flex items-center space-x-3">
-                            <input
-                              type="color"
-                              value={tempSettings.primaryColor}
-                              onChange={(e) => setTempSettings(prev => ({ ...prev, primaryColor: e.target.value }))}
-                              className="w-12 h-12 rounded-lg border border-gray-300 cursor-pointer"
-                            />
-                            <input
-                              type="text"
-                              value={tempSettings.primaryColor}
-                              onChange={(e) => setTempSettings(prev => ({ ...prev, primaryColor: e.target.value }))}
-                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm"
-                              placeholder="#3B82F6"
-                              dir="ltr"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Secondary Color */}
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Secondary Color
-                          </label>
-                          <div className="flex items-center space-x-3">
-                            <input
-                              type="color"
-                              value={tempSettings.secondaryColor}
-                              onChange={(e) => setTempSettings(prev => ({ ...prev, secondaryColor: e.target.value }))}
-                              className="w-12 h-12 rounded-lg border border-gray-300 cursor-pointer"
-                            />
-                            <input
-                              type="text"
-                              value={tempSettings.secondaryColor}
-                              onChange={(e) => setTempSettings(prev => ({ ...prev, secondaryColor: e.target.value }))}
-                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm"
-                              placeholder="#2563EB"
-                              dir="ltr"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Accent Color */}
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Accent Color
-                          </label>
-                          <div className="flex items-center space-x-3">
-                            <input
-                              type="color"
-                              value={tempSettings.accentColor}
-                              onChange={(e) => setTempSettings(prev => ({ ...prev, accentColor: e.target.value }))}
-                              className="w-12 h-12 rounded-lg border border-gray-300 cursor-pointer"
-                            />
-                            <input
-                              type="text"
-                              value={tempSettings.accentColor}
-                              onChange={(e) => setTempSettings(prev => ({ ...prev, accentColor: e.target.value }))}
-                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm"
-                              placeholder="#60A5FA"
-                              dir="ltr"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Color Preview */}
-                      <div className="p-4 bg-white rounded-lg border border-gray-200">
-                        <p className="text-sm font-medium text-gray-700 mb-3">Preview:</p>
-                        <div className="flex space-x-3">
-                          <div 
-                            className="w-16 h-16 rounded-lg shadow-sm border border-gray-200"
-                            style={{ backgroundColor: tempSettings.primaryColor }}
-                            title="Primary Color"
-                          ></div>
-                          <div 
-                            className="w-16 h-16 rounded-lg shadow-sm border border-gray-200"
-                            style={{ backgroundColor: tempSettings.secondaryColor }}
-                            title="Secondary Color"
-                          ></div>
-                          <div 
-                            className="w-16 h-16 rounded-lg shadow-sm border border-gray-200"
-                            style={{ backgroundColor: tempSettings.accentColor }}
-                            title="Accent Color"
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Class Theme Preview (when custom theme is disabled) */}
-                  {!tempSettings.customTheme && (
-                    <div className="p-4 bg-white rounded-lg border border-gray-200">
-                      <p className="text-sm font-medium text-gray-700 mb-3">
-                        Automatic Year Group Themes:
-                      </p>
-                      <div className="space-y-3">
-                        {tempYearGroups.map(group => (
-                          <div key={group.id} className="flex items-center justify-between">
-                            <span className="text-sm text-gray-600">{group.name}</span>
-                            <div className="flex space-x-2">
-                              <div 
-                                className="w-6 h-6 rounded" 
-                                style={{ backgroundColor: group.color || '#6B7280' }}
-                                title="Primary"
-                              ></div>
-                              <div 
-                                className="w-6 h-6 rounded" 
-                                style={{ backgroundColor: adjustColor(group.color || '#6B7280', -20) }}
-                                title="Secondary"
-                              ></div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Reset Section */}
-              <div className="bg-red-50 border border-red-200 rounded-xl p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Reset Settings</h3>
-                    <p className="text-sm text-gray-600">
-                      Reset all settings to their default values. This action cannot be undone.
-                    </p>
-                  </div>
-                  <button
-                    onClick={handleReset}
-                    className="inline-flex items-center space-x-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-200"
-                  >
-                    <RotateCcw className="h-4 w-4" />
-                    <span>Reset All</span>
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
-
-          {activeTab === 'yeargroups' && (
-            <>
-              {/* Year Group Management */}
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center space-x-3">
-                    <Users className="h-6 w-6 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Year Group Management</h3>
-                  </div>
-                  <button
-                    onClick={handleResetYearGroups}
-                    className="px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-1"
-                  >
-                    <RotateCcw className="h-3.5 w-3.5" />
-                    <span>Reset to Default</span>
-                  </button>
-                </div>
-
-                {/* Add New Year Group */}
-                <div className="bg-white rounded-lg border border-blue-200 p-4 mb-6">
-                  <h4 className="font-medium text-gray-900 mb-3">Add New Year Group</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div>
-                      <label className="block text-xs font-medium text-gray-500 mb-1">
-                        ID (used in system)
-                      </label>
-                      <input
-                        type="text"
-                        value={newYearGroupId}
-                        onChange={(e) => setNewYearGroupId(e.target.value)}
-                        placeholder="e.g., Year1"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                        dir="ltr"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-500 mb-1">
-                        Display Name
-                      </label>
-                      <input
-                        type="text"
-                        value={newYearGroupName}
-                        onChange={(e) => setNewYearGroupName(e.target.value)}
-                        placeholder="e.g., Year 1"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                        dir="ltr"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-500 mb-1">
-                        Color
-                      </label>
-                      <div className="flex space-x-2">
-                        <input
-                          type="color"
-                          value={newYearGroupColor}
-                          onChange={(e) => setNewYearGroupColor(e.target.value)}
-                          className="h-9 w-9 rounded border border-gray-300 cursor-pointer"
-                        />
-                        <button
-                          onClick={handleAddYearGroup}
-                          disabled={!newYearGroupId.trim() || !newYearGroupName.trim()}
-                          className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-lg transition-colors duration-200 flex items-center justify-center space-x-1"
-                        >
-                          <Plus className="h-4 w-4" />
-                          <span>Add</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-2">
-                    <strong>Note:</strong> The ID is used internally and should be unique. Changing IDs of existing year groups may affect data.
-                  </p>
-                </div>
-
-                {/* Year Group List */}
-                <div className="bg-white rounded-lg border border-blue-200 p-4">
-                  <h4 className="font-medium text-gray-900 mb-3">Manage Year Groups</h4>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Drag and drop to reorder year groups. Changes will affect how year groups are displayed throughout the application.
-                  </p>
-                  
-                  <div className="space-y-2 max-h-[400px] overflow-y-auto">
-                    {tempYearGroups.map((yearGroup, index) => (
-                      <div 
-                        key={yearGroup.id}
-                        draggable
-                        onDragStart={() => handleYearGroupDragStart(yearGroup.id)}
-                        onDragOver={(e) => handleYearGroupDragOver(e, yearGroup.id)}
-                        onDragEnd={handleYearGroupDragEnd}
-                        className={`p-3 bg-white border rounded-lg transition-all duration-200 ${
-                          draggedYearGroup === yearGroup.id 
-                            ? 'opacity-50 border-blue-400 bg-blue-50' 
-                            : 'border-gray-200 hover:border-blue-300'
-                        }`}
-                      >
-                        {editingYearGroup === yearGroup.id ? (
-                          <div className="flex items-center space-x-3">
-                            <div className="flex-shrink-0 cursor-move">
-                              <GripVertical className="h-5 w-5 text-gray-400" />
-                            </div>
-                            <div className="flex-1 grid grid-cols-3 gap-2">
-                              <input
-                                type="text"
-                                value={yearGroup.id}
-                                onChange={(e) => {
-                                  const updatedYearGroups = [...tempYearGroups];
-                                  updatedYearGroups[index].id = e.target.value;
-                                  setTempYearGroups(updatedYearGroups);
-                                }}
-                                className="px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                                dir="ltr"
-                              />
-                              <input
-                                type="text"
-                                value={yearGroup.name}
-                                onChange={(e) => {
-                                  const updatedYearGroups = [...tempYearGroups];
-                                  updatedYearGroups[index].name = e.target.value;
-                                  setTempYearGroups(updatedYearGroups);
-                                }}
-                                className="px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                                dir="ltr"
-                              />
-                              <div className="flex space-x-2">
-                                <input
-                                  type="color"
-                                  value={yearGroup.color}
-                                  onChange={(e) => {
-                                    const updatedYearGroups = [...tempYearGroups];
-                                    updatedYearGroups[index].color = e.target.value;
-                                    setTempYearGroups(updatedYearGroups);
-                                  }}
-                                  className="h-9 w-9 rounded border border-gray-300 cursor-pointer"
-                                />
-                                <button
-                                  onClick={() => setEditingYearGroup(null)}
-                                  className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors duration-200"
-                                >
-                                  <Save className="h-5 w-5" />
-                                </button>
-                              </div>
-                            </div>
-
-                          </div>
-                        ) : (
-                          <div className="flex items-center space-x-3">
-                            <div className="flex-shrink-0 cursor-move">
-                              <GripVertical className="h-5 w-5 text-gray-400" />
-                            </div>
-                            <div 
-                              className="w-4 h-4 rounded-full flex-shrink-0"
-                              style={{ backgroundColor: yearGroup.color || '#6B7280' }}
-                            ></div>
-                            <div className="flex-1 grid grid-cols-2 gap-2">
-                              <div>
-                                <span className="text-xs text-gray-500">ID:</span>
-                                <span className="ml-1 font-medium text-gray-900" dir="ltr">{yearGroup.id}</span>
-                              </div>
-                              <div>
-                                <span className="text-xs text-gray-500">Name:</span>
-                                <span className="ml-1 font-medium text-gray-900" dir="ltr">{yearGroup.name}</span>
-                              </div>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <button
-                                onClick={() => setEditingYearGroup(yearGroup.id)}
-                                className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-                              >
-                                <Edit3 className="h-4 w-4" />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteYearGroup(index)}
-                                className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-200"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Warning about changing IDs */}
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <div className="flex items-start space-x-3">
-                  <div className="text-yellow-600 flex-shrink-0 mt-0.5">⚠️</div>
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-1">Important Note About Year Group IDs</h4>
-                    <p className="text-sm text-gray-600">
-                      Changing the ID of an existing year group may affect lessons, activities, and other data associated with that year group. 
-                      It's recommended to only change the display name and color of existing year groups, not their IDs.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-
-          {activeTab === 'categories' && (
-            <>
-              {/* Category Management */}
+              {/* Activity Categories */}
               <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-6">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center space-x-3">
@@ -957,18 +622,409 @@ export function UserSettings({ isOpen, onClose }: UserSettingsProps) {
                   </div>
                 </div>
               </div>
+
+              {/* Music & Drama Category Assignment to Classes */}
+              <div className="bg-green-50 border border-green-200 rounded-xl p-6">
+                <div className="flex items-center space-x-3 mb-6">
+                  <Users className="h-6 w-6 text-green-600" />
+                  <h3 className="text-lg font-semibold text-gray-900">Assign Music & Drama Categories to Classes</h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-6">
+                  Select which year groups should have access to Music and Drama categories, and choose specific elements within each category.
+                </p>
+
+                <div className="space-y-6">
+                  {/* Class Selection */}
+                  <div className="bg-white rounded-lg border border-green-200 p-4">
+                    <h4 className="font-medium text-gray-900 mb-3">Select Class</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {tempYearGroups.map((yearGroup) => {
+                        const hasAssignment = classCategoryAssignments[yearGroup.id];
+                        return (
+                          <button
+                            key={yearGroup.id}
+                            onClick={() => handleLoadClassAssignment(yearGroup.id)}
+                            className={`p-3 border-2 rounded-lg text-left transition-colors ${
+                              selectedClass === yearGroup.id
+                                ? 'border-green-500 bg-green-50'
+                                : 'border-gray-200 hover:border-green-300'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2">
+                                <div 
+                                  className="w-4 h-4 rounded-full"
+                                  style={{ backgroundColor: yearGroup.color }}
+                                ></div>
+                                <span className="font-medium text-gray-900">{yearGroup.name}</span>
+                              </div>
+                              {hasAssignment && (
+                                <div className="flex items-center space-x-1 text-green-600">
+                                  <Check className="h-4 w-4" />
+                                  <span className="text-xs">{hasAssignment.categories.length} categories</span>
+                                </div>
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Category Assignment for Selected Class */}
+                  {selectedClass && (
+                    <div className="bg-white rounded-lg border border-green-200 p-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <h4 className="font-medium text-gray-900">
+                          Assign Categories to {tempYearGroups.find(yg => yg.id === selectedClass)?.name}
+                        </h4>
+                        <div className="text-sm text-gray-500">
+                          {selectedCategoriesForClass.size} categories selected
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        {tempCategories
+                          .filter(category => category.name === 'Music' || category.name === 'Drama')
+                          .length === 0 ? (
+                            <div className="text-center py-8 text-gray-500">
+                              <p className="text-sm">No Music or Drama categories found.</p>
+                              <p className="text-xs mt-1">Please create Music and Drama categories first in the categories section above.</p>
+                            </div>
+                          ) : (
+                            tempCategories
+                              .filter(category => category.name === 'Music' || category.name === 'Drama')
+                              .map((category) => (
+                          <div key={category.id} className="border border-gray-200 rounded-lg p-3">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center space-x-2">
+                                <div 
+                                  className="w-4 h-4 rounded-full"
+                                  style={{ backgroundColor: category.color }}
+                                ></div>
+                                <span className="font-medium text-gray-900">{category.name}</span>
+                              </div>
+                              <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedCategoriesForClass.has(category.id)}
+                                  onChange={(e) => {
+                                    const newSelected = new Set(selectedCategoriesForClass);
+                                    if (e.target.checked) {
+                                      newSelected.add(category.id);
+                                    } else {
+                                      newSelected.delete(category.id);
+                                    }
+                                    setSelectedCategoriesForClass(newSelected);
+                                  }}
+                                  className="sr-only peer"
+                                />
+                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                              </label>
+                            </div>
+                            
+                            {/* Individual Category Elements Selection */}
+                            {selectedCategoriesForClass.has(category.id) && (
+                              <div className="ml-6 space-y-2">
+                                <p className="text-sm text-gray-600 mb-2">Select specific elements:</p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                  {getCategoryElements(category.name).map((element, index) => {
+                                    const elementId = `${category.id}-element-${index}`;
+                                    return (
+                                      <label key={elementId} className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                        <input
+                                          type="checkbox"
+                                          checked={selectedCategoryElements.has(elementId)}
+                                          onChange={(e) => {
+                                            const newSelected = new Set(selectedCategoryElements);
+                                            if (e.target.checked) {
+                                              newSelected.add(elementId);
+                                            } else {
+                                              newSelected.delete(elementId);
+                                            }
+                                            setSelectedCategoryElements(newSelected);
+                                          }}
+                                          className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                                        />
+                                        <span className="text-sm text-gray-900">{element}</span>
+                                      </label>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ))
+                          )}
+                      </div>
+
+                      {/* Save Assignment Button */}
+                      <div className="mt-6 flex justify-end space-x-3">
+                        <button
+                          onClick={() => {
+                            setSelectedClass('');
+                            setSelectedCategoriesForClass(new Set());
+                            setSelectedCategoryElements(new Set());
+                          }}
+                          className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={handleSaveCategoryAssignment}
+                          disabled={selectedCategoriesForClass.size === 0}
+                          className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2"
+                        >
+                          <Save className="h-4 w-4" />
+                          <span>Save Assignment</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </>
           )}
 
-          {activeTab === 'classes' && isAdmin && (
-            <ClassManagement 
-              isOpen={true} 
-              onClose={() => {}} 
-            />
+          {activeTab === 'curriculum' && (
+            <>
+              {/* Year Group Management */}
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center space-x-3">
+                    <Users className="h-6 w-6 text-blue-600" />
+                    <h3 className="text-lg font-semibold text-gray-900">Year Group Management</h3>
+                  </div>
+                  <button
+                    onClick={handleResetYearGroups}
+                    className="px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-1"
+                  >
+                    <RotateCcw className="h-3.5 w-3.5" />
+                    <span>Reset to Default</span>
+                  </button>
+                </div>
+
+                {/* Add New Year Group */}
+                <div className="bg-white rounded-lg border border-blue-200 p-4 mb-6">
+                  <h4 className="font-medium text-gray-900 mb-3">Add New Year Group</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500 mb-1">
+                        ID (used in system)
+                      </label>
+                      <input
+                        type="text"
+                        value={newYearGroupId}
+                        onChange={(e) => setNewYearGroupId(e.target.value)}
+                        placeholder="e.g., Year1"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                        dir="ltr"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500 mb-1">
+                        Display Name
+                      </label>
+                      <input
+                        type="text"
+                        value={newYearGroupName}
+                        onChange={(e) => setNewYearGroupName(e.target.value)}
+                        placeholder="e.g., Year 1"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                        dir="ltr"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500 mb-1">
+                        Color
+                      </label>
+                      <div className="flex space-x-2">
+                        <input
+                          type="color"
+                          value={newYearGroupColor}
+                          onChange={(e) => setNewYearGroupColor(e.target.value)}
+                          className="h-9 w-9 rounded border border-gray-300 cursor-pointer"
+                        />
+                        <button
+                          onClick={handleAddYearGroup}
+                          disabled={!newYearGroupId.trim() || !newYearGroupName.trim() || isLoadingYearGroups}
+                          className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-lg transition-colors duration-200 flex items-center justify-center space-x-1"
+                        >
+                          {isLoadingYearGroups ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          ) : (
+                            <Plus className="h-4 w-4" />
+                          )}
+                          <span>{isLoadingYearGroups ? 'Adding...' : 'Add'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    <strong>Note:</strong> The ID is used internally and should be unique. Changing IDs of existing year groups may affect data.
+                  </p>
+                </div>
+
+                {/* Year Group List */}
+                <div className="bg-white rounded-lg border border-blue-200 p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-medium text-gray-900">Manage Year Groups</h4>
+                    {isLoadingYearGroups && (
+                      <div className="flex items-center space-x-2 text-blue-600">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                        <span className="text-sm">Loading...</span>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Drag and drop to reorder year groups. Changes will affect how year groups are displayed throughout the application.
+                  </p>
+                  
+                  {yearGroupError && (
+                    <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <div className="flex items-center space-x-2 text-red-600">
+                        <X className="h-4 w-4" />
+                        <span className="text-sm">{yearGroupError}</span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                    {tempYearGroups.map((yearGroup, index) => (
+                      <div 
+                        key={yearGroup.id}
+                        draggable
+                        onDragStart={() => handleYearGroupDragStart(yearGroup.id)}
+                        onDragOver={(e) => handleYearGroupDragOver(e, yearGroup.id)}
+                        onDragEnd={handleYearGroupDragEnd}
+                        className={`p-3 bg-white border rounded-lg transition-all duration-200 ${
+                          draggedYearGroup === yearGroup.id 
+                            ? 'opacity-50 border-blue-400 bg-blue-50' 
+                            : 'border-gray-200 hover:border-blue-300'
+                        }`}
+                      >
+                        {editingYearGroup === yearGroup.id ? (
+                          <div className="flex items-center space-x-3">
+                            <div className="flex-shrink-0 cursor-move">
+                              <GripVertical className="h-5 w-5 text-gray-400" />
+                            </div>
+                            <div className="flex-1 grid grid-cols-3 gap-2">
+                              <input
+                                type="text"
+                                value={yearGroup.id}
+                                onChange={(e) => {
+                                  const updatedYearGroups = [...tempYearGroups];
+                                  updatedYearGroups[index].id = e.target.value;
+                                  setTempYearGroups(updatedYearGroups);
+                                }}
+                                className="px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                dir="ltr"
+                              />
+                              <input
+                                type="text"
+                                value={yearGroup.name}
+                                onChange={(e) => {
+                                  const updatedYearGroups = [...tempYearGroups];
+                                  updatedYearGroups[index].name = e.target.value;
+                                  setTempYearGroups(updatedYearGroups);
+                                }}
+                                className="px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                dir="ltr"
+                              />
+                              <div className="flex space-x-2">
+                                <input
+                                  type="color"
+                                  value={yearGroup.color}
+                                  onChange={(e) => {
+                                    const updatedYearGroups = [...tempYearGroups];
+                                    updatedYearGroups[index].color = e.target.value;
+                                    setTempYearGroups(updatedYearGroups);
+                                  }}
+                                  className="h-9 w-9 rounded border border-gray-300 cursor-pointer"
+                                />
+                                <button
+                                  onClick={() => handleUpdateYearGroup(index, yearGroup.id, yearGroup.name, yearGroup.color)}
+                                  className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                                >
+                                  <Save className="h-5 w-5" />
+                                </button>
+                              </div>
+                            </div>
+
+                          </div>
+                        ) : (
+                          <div className="flex items-center space-x-3">
+                            <div className="flex-shrink-0 cursor-move">
+                              <GripVertical className="h-5 w-5 text-gray-400" />
+                            </div>
+                            <div 
+                              className="w-4 h-4 rounded-full flex-shrink-0"
+                              style={{ backgroundColor: yearGroup.color || '#6B7280' }}
+                            ></div>
+                            <div className="flex-1 grid grid-cols-2 gap-2">
+                              <div>
+                                <span className="text-xs text-gray-500">ID:</span>
+                                <span className="ml-1 font-medium text-gray-900" dir="ltr">{yearGroup.id}</span>
+                              </div>
+                              <div>
+                                <span className="text-xs text-gray-500">Name:</span>
+                                <span className="ml-1 font-medium text-gray-900" dir="ltr">{yearGroup.name}</span>
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <button
+                                onClick={() => setEditingYearGroup(yearGroup.id)}
+                                className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                              >
+                                <Edit3 className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteYearGroup(index)}
+                                className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Warning about changing IDs */}
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="flex items-start space-x-3">
+                  <div className="text-yellow-600 flex-shrink-0 mt-0.5">⚠️</div>
+                  <div>
+                    <h4 className="font-medium text-gray-900 mb-1">Important Note About Year Group IDs</h4>
+                    <p className="text-sm text-gray-600">
+                      Changing the ID of an existing year group may affect lessons, activities, and other data associated with that year group. 
+                      It's recommended to only change the display name and color of existing year groups, not their IDs.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+
+              {/* Curriculum Targets Management */}
+              <CurriculumTargetsManagement 
+                isOpen={true} 
+                onClose={() => {}} 
+                embedded={true}
+              />
+            </>
           )}
 
           {activeTab === 'data' && isAdmin && (
-            <DataSourceSettings embedded={true} />
+            <>
+              <ClassManagement 
+                isOpen={true} 
+                onClose={() => {}} 
+              />
+              <DataSourceSettings embedded={true} />
+            </>
           )}
         </div>
 
